@@ -1,7 +1,7 @@
 package no.uib.inf102.wordle.controller.AI;
 
 import java.util.ArrayList;
-
+import java.util.List;
 import java.util.Map;
 
 import no.uib.inf102.wordle.model.word.WordleWord;
@@ -21,9 +21,45 @@ public class FrequencyStrategy implements IStrategy {
     }
 
     @Override
+
+    /*
+    the method eliminates impossible words based on feedback and the ncalculates the expected number of gree nmatches for each remaining word.
+    calculateExpectedGreenMatches method calculates the expected nr of green matches for a given word by comparing it with other possible words.
+    The word with the highest expected nr of green matches is returned.
+    */
     public String makeGuess(WordleWord feedback) {
-        //TODO implement this
-        return "";
+        // Task 3
+        if (feedback != null) {
+            guesses.eliminateWords(feedback);
+        }
+
+        String bestGuess = null;
+        double maxExpectedGreenMatches = -1;
+  
+        for (String word : guesses.possibleAnswers()) {
+            double expectedGreenMatches = calculateExpectedGreenMatches(word);
+            if (expectedGreenMatches > maxExpectedGreenMatches) {
+                maxExpectedGreenMatches = expectedGreenMatches;
+                bestGuess = word;
+            }
+        }
+
+        return bestGuess;
+    }
+
+    private double calculateExpectedGreenMatches(String word) {
+        double totalGreenMatches = 0;
+        List<String> possibleAnswers = guesses.possibleAnswers();
+
+        for (String possibleWord : possibleAnswers) {
+            for (int i = 0; i < word.length(); i++) {
+                if (word.charAt(i) == possibleWord.charAt(i)) {
+                    totalGreenMatches++;
+                }
+            }
+        }
+
+        return totalGreenMatches / (double) possibleAnswers.size();  
     }
 
     @Override

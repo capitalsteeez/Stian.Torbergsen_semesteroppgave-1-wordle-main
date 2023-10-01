@@ -1,7 +1,7 @@
 package no.uib.inf102.wordle.model.word;
 
 import java.util.Random;
-
+import java.util.HashMap;
 import no.uib.inf102.wordle.resources.GetWords;
 
 /**
@@ -83,11 +83,49 @@ public class WordleAnswer {
             throw new IllegalArgumentException("Guess and answer must have same number of letters but guess = " + guess
                     + " and answer = " + answer);
 
-        //TODO: fix this method
+        // Task 1
         
-        AnswerType[] feedback = new AnswerType[5];
+        AnswerType[] feedback = new AnswerType[wordLength];
+        HashMap<Character, Integer> charFrequency = new HashMap<>();
+
+        // Populating the fequency map with chars from answer
+        for (char c : answer.toCharArray()) {
+            charFrequency.put(c, charFrequency.getOrDefault(c, 0) + 1);
+        }
+
+        // First pass: Tag CORRECT and update the frequency map
+        for (int i = 0; i < wordLength; i++) {
+            char guessChar = guess.charAt(i);
+            char answerChar = answer.charAt(i);
+
+            if (guessChar == answerChar) {
+                feedback[i] = AnswerType.CORRECT;
+                charFrequency.put(answerChar, charFrequency.get(answerChar) - 1);
+                if (charFrequency.get(answerChar) == 0 ) {
+                    charFrequency.remove(answerChar);
+                }
+            }
+        }
+
+        // Second pass: Tag WRONG and update the frequency map
+        for (int i = 0; i < wordLength; i++) {
+            char guessChar = guess.charAt(i);
+    
+            if (feedback[i] != AnswerType.CORRECT && charFrequency.containsKey(guessChar)) {
+                feedback[i] = AnswerType.WRONG_POSITION;
+                charFrequency.put(guessChar, charFrequency.get(guessChar) - 1);
+                if (charFrequency.get(guessChar) == 0) {
+                    charFrequency.remove(guessChar);
+                }
+            }
+        }
+           
+        // Third pass: Tag remaining chars
+
         for (int i=0; i<wordLength; i++) {
-            feedback[i] = AnswerType.WRONG;
+            if (feedback[i] == null) {
+                feedback[i] = AnswerType.WRONG;
+            }
         }
 
         return new WordleWord(guess,feedback);

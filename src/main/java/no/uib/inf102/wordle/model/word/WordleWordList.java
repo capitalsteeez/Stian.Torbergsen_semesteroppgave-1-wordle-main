@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -88,7 +89,17 @@ public class WordleWordList {
 	 * @param feedback
 	 */
 	public void eliminateWords(WordleWord feedback) {
-		//TODO implement this
+		// Task 2
+		Iterator<String> iterator = possibleAnswers.iterator();
+
+		while (iterator.hasNext()) {
+			String possibleAnswer = iterator.next();
+			WordleWord feedbackForWord = WordleAnswer.matchWord(possibleAnswer, feedback.getWordString());
+
+			if (!feedbackForWord.equals(feedback)) {
+				iterator.remove();
+			}
+		}
 	}
 
 	/**
